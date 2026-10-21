@@ -6,9 +6,12 @@ A house elf that writes your quarterly accomplishments from your GitHub work: me
 quarter, plus the weekly statuses you sent in it. Claude writes it in the shape of the "Quarterly Accomplishments"
 doc: PTO, Presentations, then a section per project with short "Area: what" bullets.
 
+The easy way: install it from [Elf Desk](https://github.com/House-elves/elf-desk)'s **Elves** page, which reads
+[`elf.yaml`](elf.yaml) and asks for the settings. By hand:
+
     ./install.sh
     quarterly-review                      # the last quarter that ended, printed
     quarterly-review --quarter=2026-Q3 --save   # saved for Elf Desk's Quarterly tab
 
-Elf Desk runs it through the runner (mode `quarterly`) when you click Write the review. It never sends or posts.
+Elf Desk runs it when you click Write the review on the Quarterly tab. It never sends or posts.
 Reviews are saved in `~/.config/quarterly-review/runs/`.

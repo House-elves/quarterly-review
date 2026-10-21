@@ -1,0 +1,35 @@
+# A House Elves elf: what Elf Desk needs to install, set up and run quarterly-review.
+name: quarterly-review
+description: Writes your quarterly accomplishments from your GitHub work and weekly statuses, for the desk's Quarterly tab.
+main: QuarterlyReview.java
+config: ~/.config/quarterly-review/config
+tools: [gh, claude]
+
+reads:
+  - Your GitHub activity for the quarter, through gh.
+  - The weekly statuses weekly-status saved on this machine, if there are any.
+writes:
+  - Nothing outside this machine. The review is saved for the Quarterly tab.
+
+settings:
+  - key: DISPLAY_NAME
+    label: Your name
+    help: Who the review is about.
+    kind: text
+  - key: GITHUB_USER
+    label: GitHub account
+    help: Whose work goes in the review.
+    kind: login
+    default: ${github-user}
+  - key: EXCLUDE_ORGS
+    label: Leave out these orgs
+    help: Comma-separated GitHub orgs whose work isn't part of the review.
+    kind: words
+    default: ""
+
+commands:
+  review:
+    label: Review the last quarter
+    args: [--save]
+
+dry-run: review
