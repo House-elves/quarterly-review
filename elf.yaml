@@ -31,5 +31,15 @@ commands:
   review:
     label: Review the last quarter
     args: [--save]
+    # The tab picks the quarter (--quarter=2026-Q3); without one it's the last quarter that ended.
+    params:
+      quarter: {pattern: "\\d{4}-Q[1-4]", optional: true}
 
 dry-run: review
+
+# Its tab on the desk, drawn by ui/quarterly.js in the desk's sandboxed frame. It reads only the reviews it saved.
+data: [runs]
+tabs:
+  - name: quarterly
+    label: Quarterly
+    page: ui/quarterly.js
