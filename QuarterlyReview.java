@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * The quarterly review: what you got done in a quarter, written the way your "Quarterly Accomplishments" doc is
  * (PTO, Presentations, then one section per project with short "Area: what" bullets). It reads your merged PRs and
  * closed issues for the quarter, and the weekly statuses you sent in it, and has Claude write the review. With
- * --save the review is saved for Elf Desk's Quarterly tab; it never sends or posts anything.
+ * --save the review is saved for its tab on Elf Desk; it never sends or posts anything.
  */
 @Command(name = "quarterly-review", mixinStandardHelpOptions = true, version = "1.0.0",
         description = "Writes your quarterly review from your GitHub work, with Claude")

@@ -11,7 +11,7 @@ The easy way: install it from [Elf Desk](https://github.com/House-elves/elf-desk
 
     ./install.sh
     quarterly-review                      # the last quarter that ended, printed
-    quarterly-review --quarter=2026-Q3 --save   # saved for Elf Desk's Quarterly tab
+    quarterly-review --quarter=2026-Q3 --save   # saved for its tab on Elf Desk
 
 On Elf Desk this elf brings the **Quarterly** tab, drawn by [`ui/quarterly.js`](ui/quarterly.js) in the desk's
 sandboxed frame: **Write the review** runs it with the quarter you picked. It never sends or posts.
