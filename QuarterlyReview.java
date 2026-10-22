@@ -277,7 +277,10 @@ public class QuarterlyReview implements Callable<Integer> {
                 """.formatted(displayName, title, start, until, displayName, title, title,
                 previous != null ? previous : EXAMPLE, data.toPrettyString());
         try {
-            Process p = new ProcessBuilder("claude", "-p", "--model", "sonnet").start();
+            // Locked down: what it reads includes other people's words (titles, comments), so Claude gets no tools
+            // (built in or MCP), none of your settings, and an empty folder of its own.
+            Process p = new ProcessBuilder("claude", "-p", "--model", "sonnet", "--tools", "", "--strict-mcp-config",
+                    "--setting-sources", "").directory(java.nio.file.Files.createTempDirectory("elf-claude-").toFile()).start();
             CompletableFuture<String> out = CompletableFuture.supplyAsync(() -> read(p.getInputStream()));
             CompletableFuture<String> err = CompletableFuture.supplyAsync(() -> read(p.getErrorStream()));
             try (var os = p.getOutputStream()) {
