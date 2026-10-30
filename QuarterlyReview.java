@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  * closed issues for the quarter, and the weekly statuses you sent in it, and has Claude write the review. With
  * --save the review is saved for its tab on Elf Desk; it never sends or posts anything.
  */
-@Command(name = "quarterly-review", mixinStandardHelpOptions = true, version = "1.0.0",
+@Command(name = "quarterly-review", mixinStandardHelpOptions = true, version = "1.1.0",
         description = "Writes your quarterly review from your GitHub work, with Claude")
 public class QuarterlyReview implements Callable<Integer> {
 
@@ -279,8 +279,12 @@ public class QuarterlyReview implements Callable<Integer> {
         try {
             // Locked down: what it reads includes other people's words (titles, comments), so Claude gets no tools
             // (built in or MCP), none of your settings, and an empty folder of its own.
-            Process p = new ProcessBuilder("claude", "-p", "--model", "sonnet", "--tools", "", "--strict-mcp-config",
-                    "--setting-sources", "").directory(java.nio.file.Files.createTempDirectory("elf-claude-").toFile()).start();
+            // Run by the House Elves runner: the coding agent its settings chose, locked down the same way (ELF_ASK).
+            String ask = System.getenv("ELF_ASK");
+            boolean viaAsk = ask != null && !ask.isBlank();
+            Process p = new ProcessBuilder(viaAsk ? List.of(ask, "--minutes", "6")
+                    : List.of("claude", "-p", "--model", "sonnet", "--tools", "", "--strict-mcp-config", "--setting-sources", ""))
+                    .directory(java.nio.file.Files.createTempDirectory("elf-claude-").toFile()).start();
             CompletableFuture<String> out = CompletableFuture.supplyAsync(() -> read(p.getInputStream()));
             CompletableFuture<String> err = CompletableFuture.supplyAsync(() -> read(p.getErrorStream()));
             try (var os = p.getOutputStream()) {
@@ -288,26 +292,28 @@ public class QuarterlyReview implements Callable<Integer> {
             }
             if (!p.waitFor(6, TimeUnit.MINUTES)) {
                 p.destroyForcibly();
-                System.err.println("Claude took too long");
+                System.err.println("The coding agent took too long");
                 return null;
             }
             String stdout = out.get(10, TimeUnit.SECONDS).strip();
             if (p.exitValue() != 0) {
-                System.err.println("Claude failed: " + err.get(10, TimeUnit.SECONDS).strip());
+                System.err.println("The coding agent failed: " + err.get(10, TimeUnit.SECONDS).strip());
                 return null;
             }
+            // ELF_ASK answers as claude -p --output-format json does: the text is its result.
+            if (viaAsk) stdout = JSON.readTree(stdout).path("result").asText("").strip();
             // The review starts at its "# Q3 2026" line: anything before it (a greeting a global CLAUDE.md asks for)
             // isn't the review.
             int at = stdout.indexOf("# " + title);
             if (at < 0) {
-                System.err.println("Claude didn't write the review: " + stdout.substring(0, Math.min(300, stdout.length())));
+                System.err.println("The coding agent didn't write the review: " + stdout.substring(0, Math.min(300, stdout.length())));
                 return null;
             }
             stdout = stdout.substring(at);
             if (stdout.endsWith("```")) stdout = stdout.substring(0, stdout.length() - 3);
             return stdout.strip();
         } catch (Exception e) {
-            System.err.println("Claude error: " + e.getMessage());
+            System.err.println("Coding agent error: " + e.getMessage());
             return null;
         }
     }
